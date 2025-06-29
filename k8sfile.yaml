@@ -28,9 +28,9 @@ spec:
         image: us-central1-docker.pkg.dev/devops-practices-2025/springbootdockerrepo/spring-boot-mongo:master-18
         ports:
         - containerPort: 8080
+
 ---
 
-# 5. Spring Boot Service
 apiVersion: v1
 kind: Service
 metadata:
@@ -46,24 +46,21 @@ spec:
     name: http
 
 ---
-
-# 6. Ingress with Placeholder
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: javawebapp-ingress
   namespace: webapps
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  ingressClassName: nginx
   rules:
-    - host: springboot.local
-      http:
-        paths:
-          - path: /maven-web-application/
-            pathType: Prefix
-            backend:
-              service:
-                name: javawebapp-svc
-                port:
-                  number: 80
+  - host: mavenapp.local
+    http:
+      paths:
+      - path: /maven-web-application
+        pathType: Prefix
+        backend:
+          service:
+            name: javawebapp-svc
+            port:
+              number: 80
