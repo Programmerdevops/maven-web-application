@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: javawebapp-deployment
-  namespace: test
+  namespace: webapps
 spec:
   replicas: 2
   revisionHistoryLimit: 5
@@ -25,21 +25,45 @@ spec:
     spec:
       containers:
       - name: javawebapp-container
-        image: prcdocker/java-web-docker:1
+        image: us-central1-docker.pkg.dev/devops-practices-2025/springbootdockerrepo/spring-boot-mongo:master-11
         ports:
         - containerPort: 8080
 ---
+
+# 5. Spring Boot Service
 apiVersion: v1
 kind: Service
 metadata:
-  name: javawebappsvc
-  namespace: test
+  name: javawebapp-svc
+  namespace: webapps
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: javawebapp
   ports:
-  - port: 8080
+  - port: 80
     targetPort: 8080
-    name: javawebapp
-    nodePort: 30004
+    name: http
+
+---
+
+# 6. Ingress with Placeholder
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: javawebapp-ingress
+  namespace: webapps
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: springboot.local         # <-- replaced in Jenkins pipeline
+      http:
+        paths:
+          - path: /maven-web-application   # <-- replaced in Jenkins pipeline
+            pathType: Prefix
+            backend:
+              service:
+                name: javawebapp-svc
+                port:
+                  number: 80
