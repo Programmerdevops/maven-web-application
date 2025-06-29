@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
       - name: javawebapp-container
-        image: __DOCKER_IMAGE__
+        image: us-central1-docker.pkg.dev/devops-practices-2025/springbootdockerrepo/spring-boot-mongo:master-11
         ports:
         - containerPort: 8080
 ---
@@ -57,10 +57,10 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - host: __INGRESS_HOST__         # <-- replaced in Jenkins pipeline
+    - host: springboot.local         # <-- replaced in Jenkins pipeline
       http:
         paths:
-          - path: __INGRESS_PATH__   # <-- replaced in Jenkins pipeline
+          - path: /maven-web-application   # <-- replaced in Jenkins pipeline
             pathType: Prefix
             backend:
               service:
