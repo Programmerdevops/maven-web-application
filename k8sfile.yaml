@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
       - name: javawebapp-container
-        image: us-central1-docker.pkg.dev/devops-practices-2025/springbootdockerrepo/spring-boot-mongo:master-18
+        image: us-central1-docker.pkg.dev/devops-practices-2025/springbootdockerrepo/spring-boot-mongo:master-19
         ports:
         - containerPort: 8080
 
@@ -54,7 +54,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: mavenapp.local
+  - host: maven.local
     http:
       paths:
       - path: /maven-web-application
