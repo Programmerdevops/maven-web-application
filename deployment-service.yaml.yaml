@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: javawebapp-deployment
+  namespace: webapps
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 30
+  selector:
+    matchExpressions:
+    - key: app
+      operator: In
+      values:
+      - javawebapp
+  template:
+    metadata:
+      labels:
+        app: javawebapp
+    spec:
+      containers:
+      - name: javawebapp-container
+        image: __DOCKER_IMAGE__
+        ports:
+        - containerPort: 8080
+---
+
+# 5. Spring Boot Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: javawebapp-svc
+  namespace: webapps
+spec:
+  type: ClusterIP
+  selector:
+    app: javawebapp
+  ports:
+  - port: 80
+    targetPort: 8080
+    name: http
+
+---
+
+# 6. Ingress with Placeholder
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: javawebapp-ingress
+  namespace: webapps
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: __INGRESS_HOST__         # <-- replaced in Jenkins pipeline
+      http:
+        paths:
+          - path: __INGRESS_PATH__   # <-- replaced in Jenkins pipeline
+            pathType: Prefix
+            backend:
+              service:
+                name: javawebapp-svc
+                port:
+                  number: 80
